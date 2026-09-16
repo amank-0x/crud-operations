@@ -1,5 +1,6 @@
 const Blog = require('../models/Blog');
 
+// Create a new blog post
 exports.createBlog = async (req, res) => {
   try {
     const { title, content, category, coverImage } = req.body;
@@ -12,10 +13,10 @@ exports.createBlog = async (req, res) => {
     }
 
     const newBlog = await Blog.create({
-      title,
-      content,
-      category: category || 'General',
-      coverImage: coverImage || '',
+      title: title.trim(),
+      content: content.trim(),
+      category: category ? category.trim() : 'General',
+      coverImage: coverImage ? coverImage.trim() : '',
       author: req.user._id
     });
 
@@ -23,7 +24,7 @@ exports.createBlog = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: 'Blog post created successfully in MongoDB database!',
+      message: 'Blog post created successfully in MongoDB!',
       blog: populatedBlog
     });
   } catch (error) {
@@ -35,9 +36,25 @@ exports.createBlog = async (req, res) => {
   }
 };
 
+// Retrieve all blogs with optional search query & category filter
 exports.getBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find()
+    const { search, category } = req.query;
+    let queryFilter = {};
+
+    if (category && category !== 'All') {
+      queryFilter.category = category;
+    }
+
+    if (search && search.trim() !== '') {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      queryFilter.$or = [
+        { title: searchRegex },
+        { content: searchRegex }
+      ];
+    }
+
+    const blogs = await Blog.find(queryFilter)
       .populate('author', 'username email')
       .sort({ createdAt: -1 });
 
@@ -55,6 +72,7 @@ exports.getBlogs = async (req, res) => {
   }
 };
 
+// Get single blog post by ID
 exports.getBlogById = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id).populate('author', 'username email');
@@ -77,6 +95,49 @@ exports.getBlogById = async (req, res) => {
   }
 };
 
+// Update an existing blog post (Author only)
+exports.updateBlog = async (req, res) => {
+  try {
+    const { title, content, category, coverImage } = req.body;
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: 'Blog post not found.'
+      });
+    }
+
+    if (blog.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized: You can only edit your own blog posts.'
+      });
+    }
+
+    if (title) blog.title = title.trim();
+    if (content) blog.content = content.trim();
+    if (category) blog.category = category.trim();
+    if (coverImage !== undefined) blog.coverImage = coverImage.trim();
+
+    await blog.save();
+    const updatedBlog = await Blog.findById(blog._id).populate('author', 'username email');
+
+    return res.status(200).json({
+      success: true,
+      message: 'Blog post updated successfully!',
+      blog: updatedBlog
+    });
+  } catch (error) {
+    console.error('Update Blog Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while updating blog post.'
+    });
+  }
+};
+
+// Delete a blog post (Author only)
 exports.deleteBlog = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
@@ -105,6 +166,22 @@ exports.deleteBlog = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error while deleting blog post.'
+    });
+  }
+};
+
+// Get list of distinct blog categories
+exports.getCategories = async (req, res) => {
+  try {
+    const categories = await Blog.distinct('category');
+    return res.status(200).json({
+      success: true,
+      categories: ['All', ...categories]
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server error fetching categories.'
     });
   }
 };

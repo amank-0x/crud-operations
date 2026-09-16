@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dev Pulse Blog | MongoDB Edition</title>
+  <title>Dev Pulse Blog | Full CRUD & MongoDB</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -13,7 +13,7 @@
     <div class="container nav-container">
       <a href="index.html" class="brand-logo" id="brand-home">
         <i class="fa-solid fa-database"></i>
-        <span>DevPulse<strong>Mongo</strong></span>
+        <span>DevPulse<strong>CRUD</strong></span>
       </a>
 
       <nav class="nav-links">
@@ -50,18 +50,26 @@
     <!-- Home Feed View -->
     <section id="view-home" class="view-section active">
       <div class="hero-banner">
-        <div class="db-badge"><i class="fa-solid fa-leaf"></i> Powered by MongoDB & Mongoose</div>
-        <h1>Explore & Publish Developer Blogs</h1>
-        <p>User credentials and articles are stored securely in MongoDB database.</p>
+        <div class="db-badge"><i class="fa-solid fa-layer-group"></i> Full CRUD Engine • MongoDB & Mongoose</div>
+        <h1>Manage, Search & Filter Blogs</h1>
+        <p>Complete Create, Read, Update, and Delete operations powered by RESTful APIs.</p>
         <div class="hero-actions guest-only">
           <button class="btn btn-lg btn-light" id="hero-get-started">Get Started</button>
         </div>
       </div>
 
       <div class="section-header">
-        <h2>All Database Articles</h2>
+        <h2>Articles Feed</h2>
         <div class="filter-bar">
-          <input type="text" id="search-input" placeholder="Search blogs by title or author..." class="form-input search-input">
+          <select id="category-filter" class="form-input category-select">
+            <option value="All">All Categories</option>
+            <option value="Database & MongoDB">Database & MongoDB</option>
+            <option value="Backend Development">Backend Development</option>
+            <option value="Frontend & Architecture">Frontend & Architecture</option>
+            <option value="Tutorial">Tutorial</option>
+            <option value="Career">Career</option>
+          </select>
+          <input type="text" id="search-input" placeholder="Search title or content..." class="form-input search-input">
         </div>
       </div>
 
@@ -78,7 +86,7 @@
         <div class="auth-header">
           <i class="fa-solid fa-lock auth-icon"></i>
           <h2>Welcome Back</h2>
-          <p>Log in with your MongoDB credentials</p>
+          <p>Log in to create, update, or delete your articles</p>
         </div>
         <form id="form-login" class="auth-form">
           <div class="form-group">
@@ -110,8 +118,8 @@
       <div class="auth-card">
         <div class="auth-header">
           <i class="fa-solid fa-user-plus auth-icon"></i>
-          <h2>Create User Account</h2>
-          <p>Register user credentials securely in MongoDB</p>
+          <h2>Create Account</h2>
+          <p>Register to gain full author CRUD privileges</p>
         </div>
         <form id="form-register" class="auth-form">
           <div class="form-group">
@@ -136,7 +144,7 @@
             </div>
           </div>
           <button type="submit" class="btn btn-primary btn-block" id="btn-submit-register">
-            <i class="fa-solid fa-user-check"></i> Save to Database & Register
+            <i class="fa-solid fa-user-check"></i> Register Account
           </button>
         </form>
         <p class="auth-footer">
@@ -149,13 +157,13 @@
     <section id="view-create-blog" class="view-section hidden">
       <div class="create-blog-card">
         <div class="card-header">
-          <h2><i class="fa-solid fa-pen-nib"></i> Write & Store Blog Post</h2>
-          <p>Submit article data to be stored securely in the MongoDB database.</p>
+          <h2><i class="fa-solid fa-plus-circle"></i> Create New Blog Post</h2>
+          <p>Fill in the form to publish a new post to the database.</p>
         </div>
         <form id="form-create-blog" class="blog-form">
           <div class="form-group">
             <label for="blog-title">Article Title</label>
-            <input type="text" id="blog-title" class="form-input" placeholder="e.g. MongoDB Aggregations & Schema Design" required minlength="3">
+            <input type="text" id="blog-title" class="form-input" placeholder="e.g. Mastering Full CRUD REST APIs" required minlength="3">
           </div>
 
           <div class="form-row">
@@ -166,6 +174,7 @@
                 <option value="Backend Development">Backend Development</option>
                 <option value="Frontend & Architecture">Frontend & Architecture</option>
                 <option value="Tutorial">Tutorial</option>
+                <option value="Career">Career</option>
               </select>
             </div>
             <div class="form-group flex-2">
@@ -182,7 +191,54 @@
           <div class="form-actions">
             <button type="button" class="btn btn-outline" id="btn-cancel-blog">Cancel</button>
             <button type="submit" class="btn btn-primary" id="btn-submit-blog">
-              <i class="fa-solid fa-database"></i> Save & Publish Post
+              <i class="fa-solid fa-paper-plane"></i> Publish Article
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Edit Blog View -->
+    <section id="view-edit-blog" class="view-section hidden">
+      <div class="create-blog-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-pen-to-square"></i> Edit Blog Post (Update)</h2>
+          <p>Modify your article details and save changes to MongoDB.</p>
+        </div>
+        <form id="form-edit-blog" class="blog-form">
+          <input type="hidden" id="edit-blog-id">
+
+          <div class="form-group">
+            <label for="edit-blog-title">Article Title</label>
+            <input type="text" id="edit-blog-title" class="form-input" required minlength="3">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="edit-blog-category">Category</label>
+              <select id="edit-blog-category" class="form-input">
+                <option value="Database & MongoDB">Database & MongoDB</option>
+                <option value="Backend Development">Backend Development</option>
+                <option value="Frontend & Architecture">Frontend & Architecture</option>
+                <option value="Tutorial">Tutorial</option>
+                <option value="Career">Career</option>
+              </select>
+            </div>
+            <div class="form-group flex-2">
+              <label for="edit-blog-cover">Cover Image URL</label>
+              <input type="url" id="edit-blog-cover" class="form-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-blog-content">Article Content</label>
+            <textarea id="edit-blog-content" class="form-input form-textarea" rows="8" required minlength="10"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="btn-cancel-edit-blog">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-edit-blog">
+              <i class="fa-solid fa-floppy-disk"></i> Save & Update Post
             </button>
           </div>
         </form>
@@ -194,7 +250,7 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container footer-content">
-      <p>&copy; 2026 DevPulse Blog Platform — Task 3 MongoDB Integration.</p>
+      <p>&copy; 2026 DevPulse Blog Platform — Full CRUD Operations Engine.</p>
     </div>
   </footer>
 
