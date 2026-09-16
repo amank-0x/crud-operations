@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dev Pulse Blog | MongoDB Edition</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" id="brand-home">
+        <i class="fa-solid fa-database"></i>
+        <span>DevPulse<strong>Mongo</strong></span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html" class="nav-btn active" id="nav-home">
+          <i class="fa-solid fa-house"></i> Home
+        </a>
+        <button class="nav-btn auth-only hidden" id="nav-create-blog">
+          <i class="fa-solid fa-pen-to-square"></i> Create Blog
+        </button>
+        <button class="nav-btn guest-only" id="nav-login">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
+        </button>
+        <button class="btn btn-primary guest-only" id="nav-register">
+          <i class="fa-solid fa-user-plus"></i> Register
+        </button>
+        
+        <div class="user-profile auth-only hidden" id="user-profile-badge">
+          <div class="user-avatar" id="avatar-initial">U</div>
+          <span class="user-name" id="user-display-name">User</span>
+          <button class="btn btn-outline-danger btn-sm" id="btn-logout" title="Logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Main Content Container -->
+  <main class="container main-content">
+    
+    <!-- Home Feed View -->
+    <section id="view-home" class="view-section active">
+      <div class="hero-banner">
+        <div class="db-badge"><i class="fa-solid fa-leaf"></i> Powered by MongoDB & Mongoose</div>
+        <h1>Explore & Publish Developer Blogs</h1>
+        <p>User credentials and articles are stored securely in MongoDB database.</p>
+        <div class="hero-actions guest-only">
+          <button class="btn btn-lg btn-light" id="hero-get-started">Get Started</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h2>All Database Articles</h2>
+        <div class="filter-bar">
+          <input type="text" id="search-input" placeholder="Search blogs by title or author..." class="form-input search-input">
+        </div>
+      </div>
+
+      <div id="blogs-grid" class="blogs-grid">
+        <div class="loading-spinner">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Loading blogs from MongoDB...
+        </div>
+      </div>
+    </section>
+
+    <!-- Login View -->
+    <section id="view-login" class="view-section hidden">
+      <div class="auth-card">
+        <div class="auth-header">
+          <i class="fa-solid fa-lock auth-icon"></i>
+          <h2>Welcome Back</h2>
+          <p>Log in with your MongoDB credentials</p>
+        </div>
+        <form id="form-login" class="auth-form">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <div class="input-icon-wrapper">
+              <i class="fa-regular fa-envelope input-icon"></i>
+              <input type="email" id="login-email" class="form-input" placeholder="name@example.com" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <div class="input-icon-wrapper">
+              <i class="fa-solid fa-key input-icon"></i>
+              <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-submit-login">
+            <i class="fa-solid fa-right-to-bracket"></i> Login
+          </button>
+        </form>
+        <p class="auth-footer">
+          Don't have an account? <a href="#" id="link-to-register">Register here</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Register View -->
+    <section id="view-register" class="view-section hidden">
+      <div class="auth-card">
+        <div class="auth-header">
+          <i class="fa-solid fa-user-plus auth-icon"></i>
+          <h2>Create User Account</h2>
+          <p>Register user credentials securely in MongoDB</p>
+        </div>
+        <form id="form-register" class="auth-form">
+          <div class="form-group">
+            <label for="register-username">Username</label>
+            <div class="input-icon-wrapper">
+              <i class="fa-regular fa-user input-icon"></i>
+              <input type="text" id="register-username" class="form-input" placeholder="johndoe" required minlength="2">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="register-email">Email Address</label>
+            <div class="input-icon-wrapper">
+              <i class="fa-regular fa-envelope input-icon"></i>
+              <input type="email" id="register-email" class="form-input" placeholder="john@example.com" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <div class="input-icon-wrapper">
+              <i class="fa-solid fa-key input-icon"></i>
+              <input type="password" id="register-password" class="form-input" placeholder="Minimum 6 characters" required minlength="6">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-submit-register">
+            <i class="fa-solid fa-user-check"></i> Save to Database & Register
+          </button>
+        </form>
+        <p class="auth-footer">
+          Already have an account? <a href="#" id="link-to-login">Log in here</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Create Blog View -->
+    <section id="view-create-blog" class="view-section hidden">
+      <div class="create-blog-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-pen-nib"></i> Write & Store Blog Post</h2>
+          <p>Submit article data to be stored securely in the MongoDB database.</p>
+        </div>
+        <form id="form-create-blog" class="blog-form">
+          <div class="form-group">
+            <label for="blog-title">Article Title</label>
+            <input type="text" id="blog-title" class="form-input" placeholder="e.g. MongoDB Aggregations & Schema Design" required minlength="3">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="blog-category">Category</label>
+              <select id="blog-category" class="form-input">
+                <option value="Database & MongoDB">Database & MongoDB</option>
+                <option value="Backend Development">Backend Development</option>
+                <option value="Frontend & Architecture">Frontend & Architecture</option>
+                <option value="Tutorial">Tutorial</option>
+              </select>
+            </div>
+            <div class="form-group flex-2">
+              <label for="blog-cover">Cover Image URL (Optional)</label>
+              <input type="url" id="blog-cover" class="form-input" placeholder="https://images.unsplash.com/...">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="blog-content">Article Content</label>
+            <textarea id="blog-content" class="form-input form-textarea" rows="8" placeholder="Write full article content..." required minlength="10"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="btn-cancel-blog">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-blog">
+              <i class="fa-solid fa-database"></i> Save & Publish Post
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>&copy; 2026 DevPulse Blog Platform — Task 3 MongoDB Integration.</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
